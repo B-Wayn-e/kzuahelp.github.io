@@ -17,6 +17,9 @@ import vueI18n from "@intlify/vite-plugin-vue-i18n";
 //// Filesystem-Based Router
 import Pages from "vite-plugin-pages";
 
+//// Sitemap generation
+import generateSitemap from "vite-plugin-pages-sitemap";
+
 //// Automatic slug generation from title
 import { slugify } from "transliteration";
 
@@ -65,6 +68,13 @@ export default ({ mode }) => {
       // Disable module preload polyfill due to double request in firefox
       // https://github.com/vitejs/vite/issues/5532
       polyfillModulePreload: false,
+
+      rollupOptions: {
+        input: {
+          // Use 404.html hack to use WebHistory routing on github pages
+          main: resolve(__dirname, "404.html"),
+        },
+      },
     },
 
     resolve: {
@@ -304,6 +314,13 @@ export default ({ mode }) => {
 
           return route;
         },
+
+        onRoutesGenerated: (routes) =>
+          generateSitemap({
+            routes,
+            readable: true,
+            hostname: "https://helpukraine.kz/",
+          }),
       }),
     ],
     css: {
